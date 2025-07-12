@@ -1,5 +1,5 @@
 const Course = require("../models/Course");
-const Tag = require("../models/tags");
+const Tag = require("../models/Category");
 const User = require("../models/User");
 const {uploadImageToCloudinary} = require("../utils/imageUploader");
 
@@ -138,6 +138,60 @@ exportsgetAllCourses = async (req, res) => {
             return res.status(500).json({
                 success : false,
                 message: "Sometthing went wrong while getting all courses",
+            });
+    }
+}
+
+
+
+// get All course whole details
+
+exports.getCourseDetails = async (req, res) => {
+    try{
+
+        const {courseId} = req.body;
+
+        // find course details 
+
+        const courseDetails = await Course.find(courseId)
+        .populate({
+            path:"instructor",
+            populate : {
+                path : additionalDetails,
+            },
+
+        })
+        .populate("ratingAndReviews")
+        .populate({
+            path : "courseContent",
+            populate:{
+                path:subSetion,
+            },
+        })
+        .populate("category")
+        .exec();
+
+
+        if(!courseDetails){
+            return res.status(400).json({
+                success : false,
+                message : "Couldnt find CourseDetails using courseId ",
+            });
+        }
+
+        return res.status(200).json({
+            success:true,
+            message:"COurseDetails are fetched succesfully",
+            data: courseDetails
+        });
+        
+
+    }
+    catch(error){
+        console.log(error)
+            return res.status(500).json({
+                success : false,
+                message : "Something went wrong while fetching course details ",
             });
     }
 }
