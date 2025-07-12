@@ -1,0 +1,68 @@
+import { uploadImageToCloudinary } from '../utils/imageUploader';
+
+const Section = require('../models/Section');
+const SubSection = require("../models/SubSection");
+
+exports.createSubSection = async (req, req) => {
+
+    try{
+        // fetch data 
+        const {title, timeDuration, description, sectionId } = req.body;
+
+        // fetch file 
+        const video = req.files.videoFile;
+
+        // validate 
+
+        if(!title || !timeDuration || !description || !sectionId){
+            return res.status(401).json({
+                success: false,
+                message: "All fields are required to create SubSection" 
+            });      
+        }
+        //  upload to cloudinary
+        const uploadDetails = await uploadImageToCloudinary(video , process.env.FOLDER_NAME);
+
+        // create subsection 
+
+        const subSectionDetails = await SubSection.create({
+            title:title,
+            timeDuration:timeDuration,
+            description:description,
+            videoUrl:uploadDetails.secure_url,
+        });
+
+        const updatedSection = await Section.findByIdAndUpdate(
+            sectionId,
+            {
+                $push:{
+                    subSetion:subSectionDetails._id,
+                }
+            },
+            {new:true}
+        );
+
+
+        // log updated section here, after adding popualte query
+
+        // return response 
+        return res.status(200).json({
+            success: true,
+            message: "SubSection is Created" ,
+            data:updatedSection,
+        });
+
+
+    }
+    catch(error){
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: "Somtihng went wrong while creating a SubSection" 
+        });
+    }
+
+}
+
+
+// create delete amd update also 

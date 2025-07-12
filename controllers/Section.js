@@ -36,7 +36,8 @@ exports.createSection = async (req , res) => {
 
         return res.status(200).json({
             success: true,
-            message: "Section is Created" 
+            message: "Section is Created" ,
+            data:updateCourseDetails,
         });
     }
     catch(error){
@@ -77,6 +78,7 @@ exports.updateSection = async (req , res) => {
         return res.status(200).json({
             success: true,
             message: "Section is Updated" 
+            
         });
 
     }
@@ -108,6 +110,9 @@ exports.deleteSection = async (req, res) =>  {
                 message: "SectionId Not FOund" 
             });  
         }
+         
+            //  do we need to delete sectionId from Course schema also 
+
 
         // Delete
         await Section.findByIdAndDelete(sectionId);
